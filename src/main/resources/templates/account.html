@@ -1,0 +1,144 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="fragments/layout :: head(title=${account.username})">
+        <meta charset="UTF-8" />
+        <title></title>
+    </head>
+        <body style="background-color:lightcyan">
+        <div th:replace="fragments/layout :: nav"></div>
+        <div class="container" style="padding: 20px">
+            <div class="row">
+                <div class="col">
+                    <h6>My Picture</h6>
+                    <br/>
+                    <div th:if="${account.profilePicture==null}">
+                     <img src="/img/default.jpeg " alt="default" width="300" height="350"/>                       
+                    </div>
+                    <div th:if="${account.profilePicture!=null}">                    
+                    <img th:src="@{/profilepicture/{username}(username=${account.username})}" th:alt="${account.name}" width="300" height="350"/>
+                    </div>
+                </div>
+                <div class="col">
+                    <h1 th:text="${account.name}" style="">default name</h1>
+                    <div th:if="${account.username == #authentication.name}">
+                        <div sec:authorize="hasAuthority('USER')">
+                            <p>Change your profile picture:</p>
+                            <form th:action="@{/account/{username}(username=${account.username})}" method="POST" enctype="multipart/form-data">
+                                <input type="file" name="file" />
+                                <input type="submit" class="btn btn-info" value="Send"/>
+                            </form>
+                            <div th:if="${account.profilePicture!=null}">
+                                <label>Remove your profile picture:</label>
+                                <form th:action="@{/account/{username}/removepicture(username=${account.username})}" method="POST">
+                                    <input type="submit" class="btn btn-danger" value="Remove"/>
+                                </form>
+                            </div>
+                        </div>
+                    </div>                      
+                </div>
+            </div> 
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <div th:if="${account.username == #authentication.name}">
+                        <br/>
+                        <h3>Add new skills</h3>
+                        <form th:action="@{/account/{username}/skill (username=${account.username})}"  th:object="${skill}" method="POST">
+                            <input type="text" name="skillContent" th:field="*{skillContent}" id="skillContent" placeholder="Your new skill."/>           
+                            <input type="submit" class="btn btn-info" id="submitSkill" value="Add new skill" /> 
+                            <strong><label th:if="${#fields.hasErrors('skillContent')}" th:errors="*{skillContent}"></label></strong>                            
+                        </form>
+                    </div>   
+                    <br/>
+                    <div class="container" style="background-color: lavenderblush">
+                    <h3>My Skills</h3>
+                    <table style="color: black">
+                        <tr th:each="skill,iterStat: ${skills}" th:if="${iterStat.index} <3">
+                            <td><strong><span th:text="${skill.skillContent}"></span></strong></td>  
+                            <td>  Compliments: 
+                                <strong<span th:text="${skill.compliments.size()}"></span> </strong></td>
+                            <div th:if="${skill.compliments.size() > 0}" id="compliments" >
+                                <td> Some compliments given by other people
+                                <ul>
+                                    <li th:each="compliment, iterStat: ${skill.compliments}" th:if="${iterStat.index} <10">
+                                        <span th:text="${compliment.praise}"></span>
+                                    </li>
+                                </ul>
+                               </td>     
+                            </div>
+                        </tr>  
+                        </tr>  
+                    </table >
+                    <br/>
+                    <table style="color: gray">
+                        <tr th:each="skill,iterStat: ${skills}" th:if="${iterStat.index} >=3">
+                            <td><strong><span th:text="${skill.skillContent}"></span></strong></td>  
+                            <td>  Compliments: 
+                                <strong<span th:text="${skill.compliments.size()}"></span></strong> 
+                            </td>
+                    </table>                      
+                </div>
+                    <div th:if="${#authorization.expression('isAuthenticated()') && account.username != #authentication.name && skills.size()> 0}">                
+                    <div class="col" sec:authorize="hasAuthority('USER')">
+                        <h6>Make your contact happy by praising some skills</h6>
+                        <form th:action="@{/account/{username}/skill/compliment (username=${account.username})}" th:object="${compliment}" method="POST">
+                            <select name="skillId">
+                                <option th:each="skill: ${skills}" id="skillList" th:value="${skill.id}" th:text="${skill.skillContent}"/>
+                            </select>
+                            <input type="text" name="praise" th:field="*{praise}" id="praise"/>
+                            <input type="submit" class="btn btn-primary" id="submitPraise" value="Give an compliment"/>
+                            <strong><label th:if="${#fields.hasErrors('praise')}" th:errors="*{praise}"></label></strong>  
+                        </form>
+                    </div>
+                </div> 
+                </div>            
+            </div>    
+       </div>        
+        <div class="container" style="background-color: aliceblue">
+            <div th:if="${account.username == #authentication.name}">
+                <h3>My Contacts</h3>
+                <div th:if="${accepted.size() == 0 && notYetAccepted.size() == 0}">
+                    <p>No added contacts yet.</p>
+                </div>            
+                <div class="row">
+                    <div class="col-6">    
+                        <div th:each="contact: ${accepted}">
+                            <div th:each="account: ${contact.accounts}" style="padding:5pt">
+                                <div th:if="${account.username != #authentication.name }" >
+                                    <label><a th:href="@{/accounts/{username}(username=${account.username})}" th:text="${account.name}">linkki</a></label>
+                                    <form th:action="@{/contact/{id}/delete(id=${contact.id})}" method="POST">
+                                        <input type="submit" class="btn btn-warning" value="delete contact"/>
+                                    </form>
+                                </div> 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div th:each="contact: ${notYetAccepted}" >
+                            <div th:each="account: ${contact.accounts}" style="padding: 5pt;">                         
+                                <div th:if="${account.username != #authentication.name && contact.adder != #authentication.name}">
+                                    <label><a th:href="@{/accounts/{username}(username=${account.username})}" th:text="${account.name}">linkki</a></label>                           
+                                    <form th:action="@{/contact/{id}/accept(id=${contact.id})}" method="POST">
+                                        <input type="submit" "id"="acceptContact" class="btn btn-info" value="accept this contact"/>
+                                    </form>
+                                    <form th:action="@{/contact/{id}/delete(id=${contact.id})}" method="POST">
+                                        <input type="submit" class="btn btn-warning" value="reject this contact"/>
+                                    </form> 
+                                </div>
+                                <div th:if="${account.username != #authentication.name && contact.adder == #authentication.name}">
+                                    <label><a th:href="@{/accounts/{username}(username=${account.username})}" th:text="${account.name}">linkki</a></label>                                 
+                                    <span> has not yet accepted your request.</span>
+                                    <form th:action="@{/contact/{id}/delete(id=${contact.id})}" method="POST">
+                                       <input type="submit" class="btn btn-warning" id="deleteREquest" value="delete request"/>
+                                    </form>                                
+                                </div>    
+                            </div>
+                        </div>
+                    </div>    
+                </div>    
+            </div>
+        </div>
+        <div th:replace="fragments/layout :: footer"></div>        
+    </body>    
+</html>

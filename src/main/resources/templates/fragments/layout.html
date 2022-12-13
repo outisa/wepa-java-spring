@@ -1,0 +1,43 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+       xmlns:sec="http://www.springframework.org/security/tags">
+    <head th:fragment="head(title)">
+        <meta charset="UTF-8"/>
+        <title th:text="${title}">Layout</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>            
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"/>               
+    </head>
+    <body style="background-color:powderblue ">
+        <nav class="navbar navbar-expand-sm navbar-light" style="background-color: #4ef5a4" th:fragment="nav">
+          <a class="navbar-brand" href="/">Home</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="collapsibleNavbar">
+            <ul class="navbar-nav">
+              <li class="nav-item" >
+                <a class="nav-link" th:href="@{/search}">Search for people</a>
+              </li>                
+              <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}" >
+                <a class="nav-link" th:href="@{/comments}">Postings</a>
+              </li>
+              <li th:if="${#authorization.expression('!isAuthenticated()')}" class="nav-item">
+                <a class="nav-link" th:href="@{/login}">Log in</a>
+              </li>                
+              <li th:if="${#authorization.expression('!isAuthenticated()')}" class="nav-item">
+                <a class="nav-link" th:href="@{/registration}">Sign Up</a>
+              </li>
+              <li th:if="${#authorization.expression('isAuthenticated()')}" class="nav-item">
+                  <a class="nav-link" th:href="@{/accounts/{username}(username=${#authentication.name})}" th:text="${#authentication.name}">text</a>
+              </li>                
+            </ul>
+              <form th:action="@{/logout}" method="POST">
+                <input th:if="${#authorization.expression('isAuthenticated()')}" type="submit" class="btn btn-default navbar-btn" name="Logout" value="Logout"></input>
+              </form>
+            
+          </div>  
+        </nav>
+        
+        <footer th:fragment="footer" style="height: 115px; position: static; bottom:0px; text-align: center">GroupedIn 2020 – Meet your future</footer>
+    </body>
+</html>

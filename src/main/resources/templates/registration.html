@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="fragments/layout :: head(title='Registration')">
+        <meta charset="UTF-8" />
+        <title>Registration</title>
+    </head>
+    <body style="background-color:lightcyan">
+        <div th:replace="fragments/layout :: nav"></div>
+        <div class="container">
+            <h1>Sign up</h1>
+            <form th:action="@{/registration}" th:object="${account}" method="POST">
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" class="form-control" th:field="*{name}" placeholder="Enter your name" id="name"/>
+                    <label th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></label>     
+                </div>
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" class="form-control" th:field="*{username}" placeholder="Enter your username" id="username"/>
+                    <label th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></label>             
+                </div>            
+                <div class="form-group">
+                    <label for="pwd">Password:</label>
+                    <input type="password" class="form-control" th:field="*{password}" placeholder="Enter your password" id="pwd" onchange="check()"/> 
+                    <label th:if="${#fields.hasErrors('password')}" >Password must be between 6 and 20 characters!</label>                                  
+                </div>   
+                <div class="form-group">
+                    <label for="controlpwd">Password:</label>
+                    <input type="password" class="form-control" placeholder="Enter your password again"id="controlpwd" oninput="check()"/>
+                    <label id="checked"></label>
+                </div>    
+                <input type="submit" class="btn btn-primary" value="Create account" id="submit" disabled></input>
+            </form>
+        </div>
+        <div th:replace="fragments/layout :: footer"></div>
+        <script th:src="@{/javascript/passwordMatch.js}" defer></script>
+    </body>
+</html>

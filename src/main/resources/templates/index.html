@@ -1,0 +1,19 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="fragments/layout :: head(title='Index')">
+        <meta charset="UTF-8" />
+        <title></title>          
+    </head>
+    <body style="background-color:lightcyan ">
+        <div th:replace="fragments/layout :: nav"></div>
+        <div class="container">
+            <h1>Welcome to GroupedIn App</h1>
+            <p>You can search for interesting people <a th:href="@{/search}">here</a> without logging in.
+                If you want to be part of the greatest Group, please <a th:href="@{/registration}"> sign in</a> 
+                and start making your own group.
+                If you have an account already, just <a href="@{/login}">log in</a> and check newest posts of your contacts. 
+            </p>
+        </div>
+        <div th:replace="fragments/layout :: footer"></div>        
+    </body>
+</html>

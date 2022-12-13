@@ -1,0 +1,49 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="fragments/layout :: head(title='Accounts')">
+        <meta charset="UTF-8" />
+        <title></title>
+    </head>
+    <body style="background-color: lightcyan">
+        <div th:replace="fragments/layout :: nav"></div>
+        <div class="container" style="background-color:lavender" sec:authorize="hasAuthority('USER')">
+            <h5>Write your own comment</h5>
+            <form th:action="@{/comments}" id="newComment" th:object="${comment}" method="POST">
+                <textarea type="textarea" form="newComment" id="commentArea" name="content" th:field="*{content}"  rows="4" cols="75"  placeholder="Write what you have in mind" ></textarea>                
+                <input type="submit" class="btn btn-primary" id="sendComment" value="send"/>
+                <strong><label th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></label></strong>                  
+            </form>
+        </div>
+        <div th:if="${comments} != null" class="container">
+            <h4>Newest postings:</h4>
+            <div th:each="comment: ${comments}">
+                <div  style="padding: 10pt; background-color: lavenderblush; border: solid ">
+                    Sender: <strong><span th:text="${comment.sender}">sender</span></strong>   
+                    <span th:text="${#temporals.format(comment.localDateTime, 'dd-MM-yyyy HH:mm')}"></span><br/>
+                    <span th:text="${comment.content}"></span> <br/>
+                    Likes: <span th:text="${comment.likers.size()}"></span>
+                    <br/>
+                    <div sec:authorize="hasAuthority('USER')">
+                        <form th:action="@{/comments/{id}/likes(id=${comment.id})}" method="POST">
+                            <input type="submit" class="btn btn-primary" value="Like"/>
+                        </form>
+                    </div>
+                    <div sec:authorize="hasAuthority('USER')">
+                        <form th:action="@{/comments/{id}(id=${comment.id})}" th:object="${subComment}" method="POST">
+                            <input type="text" size="25" name="subcontent" id="subcomment"  th:field="*{subcontent}" placeholder="Add your comment ..."/>
+                            <input type="submit" id="sendSubcomment" class="btn btn-primary" value="send comment"/>
+                            <strong><label th:if="${#fields.hasErrors('subcontent')}" th:errors="*{subcontent}"></label></strong>                              
+                        </form> 
+                    </div>    
+                    <div th:each="subcomment: ${comment.subComments}" class="container" style="border: solid">
+                        Sender: <strong><span th:text="${subcomment.sender}">sender</span></strong> 
+                        <span th:text="${#temporals.format(subcomment.localDateTime, 'dd-MM-yyyy HH:mm')}"></span><br/>                       
+                        <span th:text="${subcomment.subcontent}"></span>
+                        <br/>
+                    </div>
+                </div>
+            </div>    
+        </div>
+        <div th:replace="fragments/layout :: footer"></div>
+    </body>
+</html>    

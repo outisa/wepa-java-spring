@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="fragments/layout :: head(title='Search')">
+        <meta charset="UTF-8" />
+        <title></title>
+    </head>
+    <body style="background-color:lightcyan">
+        <div th:replace="fragments/layout :: nav"></div>
+            <div class="container">
+                 <h4>Search people with name</h4>
+            <form th:action="@{/search}" method="POST">
+                <input type="text" name="text" id="searchField" placeholder="Search by a name or part of the name"/>
+                <input type="submit" class="btn btn-primary" value="search"/>
+            </form>
+        </div>
+        <div class="container">
+            <h4>Results:</h4>
+            <div th:if="${results} != null">
+                <ul>
+                    <li th:each="account: ${results}">
+                        <a th:href="@{/accounts/{username}(username=${account.username})}" th:text="${account.name}">text</a>
+                        <br/>(known with username: <span th:text="${account.username}">username</span>)
+                        <div th:if="${#authorization.expression('isAuthenticated()')}" >
+                            <div th:if="!${#lists.contains(alreadyContact, account.username)}">
+                                <form th:action="@{/search/{username}(username=${account.username})}" method="POST">
+                                    <input type="submit" class="btn btn-primary" value="add Contact" id="addContact"/>
+                                </form>
+                            </div>       
+                        </div> 
+                    </li>
+                </ul>
+            </div>
+            <div th:if="${results} == null">
+                <p>No results.</p>
+            </div>          
+        </div>
+        <div th:replace="fragments/layout :: footer"></div>        
+    </body>
+</html>    
